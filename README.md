@@ -5,7 +5,13 @@ Linux:
 cargo run
 ```
 
-Windows:
+Windows (+ docker):
 ```
 .\run.bat
+```
+
+Windows (+ tools installed)
+
+```
+cargo run
 ```
