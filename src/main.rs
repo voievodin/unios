@@ -1,27 +1,37 @@
 #![no_std] // don't link the Rust standard library
 #![no_main] // disable all Rust-level entry points
+#![feature(abi_x86_interrupt)]
 
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::ptr::write;
+use pc_keyboard::DecodedKey;
+use crate::vga_buf::SCREEN;
+
+mod vga_buf;
+mod interrupts;
+mod shell;
 
 /// This function is called on panic.
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    println!("----------------------------------------------");
+    println!("{}", _info);
+    println!("----------------------------------------------");
     loop {}
 }
 
-static HELLO: &[u8] = b"Hello World!";
+fn my_keyboard_handler(key: DecodedKey) {
+    shell::handle_keyboard_interrupt(key);
+}
+
+fn my_timer_handler() {
+}
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    let vga_buffer = 0xb8000 as *mut u8;
-
-    for (i, &byte) in HELLO.iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = byte;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xa;
-        }
-    }
+    interrupts::set_keyboard_interrupt_handler(my_keyboard_handler);
+    interrupts::set_timer_interrupt_handler(my_timer_handler);
+    interrupts::init();
     loop {}
 }
