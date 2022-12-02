@@ -21,7 +21,7 @@ if %errorlevel% neq 0 (
 
 :: Building kernel
 echo Building kernel in the unios-container
-docker exec unios-container bash -l -c "cd /unios && cargo run" 2>NUL
+docker exec unios-container bash -l -c "cd /unios && cargo run"
 
 :: Running kernel is qemu emulator
 qemu-system-x86_64 -drive format=raw,file=target/x86_64-my_os/debug/bootimage-unios.bin
